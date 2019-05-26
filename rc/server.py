@@ -6,40 +6,29 @@ import urllib
 import ev3dev.ev3 as ev3
 import time
 import random
+import sys
 
 SPEED=500
-HAND_SPEED=1300
+HAND_SPEED=500
 
-motorHand = ev3.Motor('outA')
-motorLeft = ev3.LargeMotor('outB')
-motorRight = ev3.LargeMotor('outD')
+lm1 = ev3.LargeMotor('outD')
+lm2 = ev3.LargeMotor('outB')
+m1 = ev3.Motor('outA')
 
-def rotateRight(duration):
-  motorLeft.run_forever(speed_sp=SPEED)
-  motorRight.run_forever(speed_sp=-SPEED)
+def driveMotor(motor, speed):
+  print("speed=", speed)
+  motor.run_forever(speed_sp=speed)
 
-def rotateLeft(duration):
-  motorLeft.run_forever(speed_sp=-SPEED)
-  motorRight.run_forever(speed_sp=SPEED)
-
-def forward(duration):
-  motorLeft.run_forever(speed_sp=SPEED)
-  motorRight.run_forever(speed_sp=SPEED)
-
-def backward(duration):
-  motorLeft.run_forever(speed_sp=-SPEED)
-  motorRight.run_forever(speed_sp=-SPEED)
-
-def rotateHandRight(duration):
-  motorHand.run_forever(speed_sp=HAND_SPEED)
-
-def rotateHandLeft(duration):
-  motorHand.run_forever(speed_sp=-HAND_SPEED)
+def stopMotor(motor):
+  try:
+    motor.stop()
+  except:
+    print("Unexpected error:", sys.exc_info()[0])
 
 def stop():
-  motorLeft.stop()
-  motorRight.stop()
-  motorHand.stop()
+  stopMotor(m1)
+  stopMotor(lm1)
+  stopMotor(lm2)
 
 def say():
   message = 'robbi'
@@ -49,6 +38,16 @@ def say():
   ev3.Sound.speak(message).wait()
   time.sleep(1)
 
+ACTIONS = {
+  "m1f": lambda : driveMotor(m1, HAND_SPEED),
+  "m1b": lambda : driveMotor(m1, -HAND_SPEED),
+  "lm1f": lambda : driveMotor(lm1, SPEED),
+  "lm1b": lambda : driveMotor(lm1, -SPEED),
+  "lm2f": lambda : driveMotor(lm2, SPEED),
+  "lm2b": lambda : driveMotor(lm2, -SPEED),
+  "stop": lambda : stop(),
+  "say": lambda : say()
+}
 
 class RequestHandler(BaseHTTPRequestHandler):
   def do_GET(self):
@@ -82,22 +81,12 @@ class RequestHandler(BaseHTTPRequestHandler):
       return
  
     query_components = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
-    action = query_components["action"]
-    print(action)
-    if action[0] == 'forward':
-      forward(2000)
-    elif action[0] == 'backward':
-      backward(2000)
-    elif action[0] == 'left':
-      rotateLeft(2000)
-    elif action[0] == 'right':
-      rotateRight(2000)
-    elif action[0] == 'stop':
-      stop()
-    elif action[0] == 'motor1':
-      rotateHandLeft(2000)
-    elif action[0] == 'say':
-      say()
+    actions = query_components.get("action", [])
+    print(actions)
+    for action in actions:
+      actionFunc = ACTIONS.get(action, None)
+      if actionFunc:
+        actionFunc()
 
     self.send_no_content()
 

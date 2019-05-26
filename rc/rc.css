@@ -7,8 +7,10 @@ body {
  width: 90vw;
  height: 90vh;
  display: grid;
- grid-template-columns: 25% 25% 25% 25%:
- grid-template-rows: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%;
+ grid-template: "m1f m1b"
+   "lm1f lm1f"
+   "lm1b lm1b"
+   "say say";
 }
 
 button {
@@ -24,32 +26,11 @@ button.pressed {
  color: white;
 }
 
-.left {
- grid-column: 1 / 2;
- grid-row: 1 / 8;
-}
+.m1f { grid-area: 'm1f'; }
+.m1b { grid-area: 'm1b'; }
+.lm1f { grid-area: 'lm1f'; }
+.lm1b { grid-area: 'lm1b'; }
+.lm2f { grid-area: 'lm2f'; }
+.lm2b { grid-area: 'lm2b'; }
+.say { grid-area: 'say'; }
 
-.say {
- grid-column: 2 / 4;
- grid-row: 3 / 4;
-}
-
-.motor1 {
- grid-column: 2 / 4;
- grid-row: 4 / 6;
-}
-
-.backward {
- grid-column: 2 / 4;
- grid-row: 6 / 8;
-}
-
-.forward {
- grid-column: 2 / 4;
- grid-row: 1 / 3;
-}
-
-.right {
- grid-column: 4 / 5;
- grid-row: 1 / 8;
-}
