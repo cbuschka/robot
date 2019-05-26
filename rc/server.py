@@ -9,7 +9,7 @@ import random
 import sys
 
 SPEED=500
-HAND_SPEED=500
+HAND_SPEED=300
 
 lm1 = ev3.LargeMotor('outD')
 lm2 = ev3.LargeMotor('outB')
